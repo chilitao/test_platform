@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block base %}
+
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">接口测试平台</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">{{ request.user }}</a></li>
+                <li><a href="#">设置</a></li>
+                <li><a href="/logout/">退出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li>
+                    <a href="/project/">
+                        <i class="glyphicon glyphicon-th-large"></i>&nbsp&nbsp项目管理
+                    </a>
+                </li>
+                <li>
+                    <a href="/module/">
+                        <i class="glyphicon glyphicon-th"></i>&nbsp&nbsp模块管理
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav nav-sidebar">
+                <li>
+                    <a href="/testcase/">
+                        <i class="glyphicon glyphicon-list-alt"></i>&nbsp&nbsp用例管理
+                    </a>
+                </li>
+                <li>
+                    <a href="/testtask">
+                        <i class="glyphicon glyphicon-th-list"></i>&nbsp&nbsp任务管理
+                    </a>
+                </li>
+            </ul>
+                <ul class="nav nav-sidebar">
+                    <li><a href="/locustmanager/">
+                        <i class="glyphicon glyphicon-random"></i>&nbsp&nbsplocust管理</a>
+                    </li>
+                </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h4 class="sub-header">添加压测脚本</h4>
+
+                <form enctype="multipart/form-data"  method="post"  id="upload">
+
+                    <div class="col-lg-12">
+                        <div class="col-lg-8">
+                            <input type="file" name="img" id="img" class="btn btn-default"/>
+                            <input type="text" name="companyF" id="companyF" value="{{ company_name }}" style="display: none;"/>
+                            <input type="text" name="coverFile" id="coverFile" value="False" style="display: none;"/>
+                        </div>
+                        <div class="col-lg-4" style="text-align: center;">
+                            <input type="button" class="btn btn-default" value="上传附件" onclick="transferBtn(this)" />
+                        </div>
+                        <div class="col-lg-4" style="text-align: center;">
+                            <input type="button" class="btn btn-default" value="下载文件" onclick="downloadFiles()" />
+                        </div>
+
+                    {% csrf_token %}
+                </form>
+
+    </div>
+
+
+    <script src="{%static "js/jquery.min.js"%}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <script src="{%static "js/select2.min.js"%}"></script>
+        <script src="{%static "js/myCase.js"%}"></script>
+
+
+<script type="text/javascript">
+
+
+    SelectInit();
+
+    //保存locust脚本
+    function transferBtn(cur) {
+        var form = document.getElementById("upload"),
+        formData = new FormData(form);
+        $.ajax({
+            url:"http://127.0.0.1:8000/apk/uploadfile/",
+            type:"post",
+            data:formData,
+            processData:false,
+            contentType:false,
+            success:function(data){
+            if(data == 'ok'){
+                alter("上传成功！");
+            }
+            if(data == 'exists'){
+                //询问框
+                alter('已有该文件，是否覆盖？', {
+                btn: ['确定', '取消'],
+            }, //按钮
+            function () {
+                coverFile();
+            },
+            function () {
+                alter('取消操作成功');
+            });
+            }
+      }
+ 
+    })
+    }
+    //覆盖文件的操作
+    function coverFile() {
+        var form = document.getElementById('upload');
+        $("#coverFile").val('True');
+        formData = new FormData(form);
+        $.ajax({
+           url:"{% url 'upload' %} ",
+           type:"post",
+           data:formData,
+           processData:false,
+           contentType:false,
+           success:function(data){
+            alter('覆盖文件成功');
+           }
+        })
+    }
+ 
+</script>
+
+{% endblock %}

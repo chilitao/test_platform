@@ -1,0 +1,11 @@
+django
+django-simple-captcha
+httplib2
+PyMySQL
+future
+django-crispy-forms
+django-formtools==2.1
+requests
+pytest
+unittest-xml-reporting
+ddt
